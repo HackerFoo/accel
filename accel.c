@@ -99,9 +99,15 @@ double tdf2(unsigned int ord, const double *a, const double *b, double *z, const
 // applies tdf2 on an array of data using calculated coefficients to implement
 // a 4th order Butterworth bandpass filter for 1-3 Hz, given a 20 Hz sample rate.
 void filter(double *x, int size, double *y) {
+  if(size < 1) return;
+
   const double b[9] = {0.00482434, 0, -0.01929737, 0, 0.02894606, 0, -0.01929737, 0, 0.00482434};
   const double a[9] = {1, -5.41823139, 13.5293587, -20.31926512, 20.07119886, -13.34437166, 5.83210677, -1.53473005, 0.18737949};
   double z[8] = {-0.00482434, -0.00482434, 0.01447303, 0.01447303, -0.01447303, -0.01447303, 0.00482434, 0.00482434};
+
+  // scale initial state using initial data
+  for(int i = 0; i < 8; i++) z[i] *= x[0];
+
   for(int i = 0; i < size; i++) {
     *y++ = tdf2(8, a, b, z, *x++);
   } 
